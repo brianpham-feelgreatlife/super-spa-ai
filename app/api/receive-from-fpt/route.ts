@@ -1,177 +1,134 @@
 import { NextRequest, NextResponse } from "next/server";
-import { analyzeLeadWithDeepSeek, type LeadData } from "@/lib/deepseek";
-import { appendLeadToSheet, type LeadRow } from "@/lib/sheets";
+import { analyzeLeadWithDeepSeek } from "@/lib/deepseek";
+import { appendLeadToSheet } from "@/lib/sheets";
 import { sendHotLeadAlert } from "@/lib/telegram";
 import { saveLeadToSupabase } from "@/lib/supabase";
 
-// FPT.AI JSON API Card payload schema
-interface FPTPayload {
-  source: string;
-  session_id: string;
-  customer: {
-    name: string;
-    phone: string;
-    email?: string;
-  };
-  service: string;
-  appointment_date?: string;
-  appointment_time?: string;
-  conversation_summary?: string;
-  timestamp?: string;
-}
+const WEBHOOK_SECRET = "antigravity_spa_secret_2024";
 
 export async function POST(req: NextRequest) {
   try {
-    // Security check — optional webhook secret
+    // 1. Kiểm tra Secret Key từ Header
     const secret = req.headers.get("x-webhook-secret");
-    if (
-      process.env.FPT_AI_WEBHOOK_SECRET &&
-      secret !== process.env.FPT_AI_WEBHOOK_SECRET
-    ) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (secret !== WEBHOOK_SECRET) {
+      console.warn("[Security] Unauthorized webhook access attempt");
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const body: FPTPayload = await req.json();
+    // 2. Nhận dữ liệu từ FPT.AI
+    const body = await req.json();
+    console.log("[Webhook] Received data from FPT.AI:", body);
 
-    // Validate required fields
-    if (!body.customer?.name || !body.customer?.phone) {
-      return NextResponse.json(
-        { error: "Missing required fields: customer.name, customer.phone" },
-        { status: 400 }
-      );
+    // Chuẩn hóa dữ liệu đầu vào (hỗ trợ các biến từ FPT.AI)
+    const customerName = body.customer_name || body.name || "Khách hàng";
+    const customerPhone = body.customer_phone || body.phone || "";
+    const sessionId = body.session_id || "no_session";
+    const serviceRequested = body.service || body.service_name || "Chưa xác định";
+
+    if (!customerPhone) {
+      console.error("[Webhook] Error: Missing customer phone");
+      return NextResponse.json({ error: "Missing phone number" }, { status: 400 });
     }
 
-    console.log(`[Webhook] Received lead from FPT.AI: ${body.customer.name} - ${body.customer.phone}`);
-
-    // Step 1: Build lead data for AI analysis
-    const leadData: LeadData = {
-      name: body.customer.name,
-      phone: body.customer.phone,
-      email: body.customer.email,
-      service: body.service || "Chưa xác định",
-      appointment_date: body.appointment_date,
-      appointment_time: body.appointment_time,
-      conversation_summary: body.conversation_summary,
-      source: body.source,
-    };
-
-    // Step 2: Run DeepSeek AI analysis
+    // 3. Sử dụng AI DeepSeek để phân tích chuyên sâu
     let aiResult;
     try {
-      aiResult = await analyzeLeadWithDeepSeek(leadData);
-      console.log(`[AI] Analysis complete: ${aiResult.hot_level} (${aiResult.score}/100)`);
+      aiResult = await analyzeLeadWithDeepSeek({
+        name: customerName,
+        phone: customerPhone,
+        service: serviceRequested,
+        conversation_summary: body.conversation_summary || "Khách hàng để lại thông tin qua Chatbot",
+        source: "FPT.AI Webchat"
+      });
     } catch (aiError) {
-      console.error("[AI] DeepSeek analysis failed:", aiError);
-      // Fallback result
+      console.error("[AI] DeepSeek Error:", aiError);
+      // Fallback nếu AI lỗi
       aiResult = {
         hot_level: "warm" as const,
         score: 50,
-        reasons: ["Không thể phân tích tự động — vui lòng kiểm tra thủ công"],
-        suggested_next_action: "Liên hệ trực tiếp để đánh giá",
-        appointment_recommendation: "Chưa xác định",
-        summary_vi: `Khách hàng ${body.customer.name} quan tâm đến ${body.service}`,
-        follow_up_hours: 24,
+        summary_vi: "Đang chờ AI phân tích chi tiết...",
+        suggested_next_action: "Gọi điện tư vấn trực tiếp",
+        reasons: ["AI tạm thời không phản hồi"],
+        follow_up_hours: 2,
+        appointment_recommendation: "Cần gọi lại xác nhận"
       };
     }
 
-    // Step 3: Write to Google Sheets
-    const leadRow: LeadRow = {
-      session_id: body.session_id || `manual-${Date.now()}`,
-      name: body.customer.name,
-      phone: body.customer.phone,
-      email: body.customer.email,
-      service: body.service || "Chưa xác định",
-      appointment_date: body.appointment_date,
-      appointment_time: body.appointment_time,
-      hot_level: aiResult.hot_level,
-      score: aiResult.score,
-      ai_reasons: aiResult.reasons,
-      next_action: aiResult.suggested_next_action,
-      summary: aiResult.summary_vi,
-      status: "new",
-      source: body.source || "fpt_ai_chat",
-      follow_up_hours: aiResult.follow_up_hours,
-    };
-
+    // 4. Lưu Lead vào Google Sheets CRM
     try {
-      await appendLeadToSheet(leadRow);
-      console.log("[Sheets] Lead saved to Google Sheets");
-    } catch (sheetsError) {
-      console.error("[Sheets] Failed to save:", sheetsError);
-      // Continue even if sheets fails
-    }
-
-    // Step 4: Save to Supabase (Database Persistence)
-    try {
-      await saveLeadToSupabase({
-        session_id: body.session_id,
-        name: body.customer.name,
-        phone: body.customer.phone,
-        email: body.customer.email,
-        service: body.service,
-        appointment_date: body.appointment_date,
-        appointment_time: body.appointment_time,
+      await appendLeadToSheet({
+        timestamp: new Date().toLocaleString("vi-VN"),
+        session_id: sessionId,
+        name: customerName,
+        phone: customerPhone,
+        service: serviceRequested,
         hot_level: aiResult.hot_level,
         score: aiResult.score,
-        ai_reasons: aiResult.reasons,
+        summary: aiResult.summary_vi,
+        next_action: aiResult.suggested_next_action,
+      });
+      console.log("[Sheets] Lead saved successfully");
+    } catch (sheetError) {
+      console.error("[Sheets] Google Sheets Error:", sheetError);
+    }
+
+    // 5. Lưu Lead vào Supabase (Persistence)
+    try {
+      await saveLeadToSupabase({
+        session_id: sessionId,
+        name: customerName,
+        phone: customerPhone,
+        service: serviceRequested,
+        hot_level: aiResult.hot_level,
+        score: aiResult.score,
+        ai_reasons: JSON.stringify(aiResult.reasons),
         next_action: aiResult.suggested_next_action,
         summary: aiResult.summary_vi,
         status: "new",
-        source: body.source,
+        source: "FPT.AI Webchat",
       });
       console.log("[Supabase] Lead saved successfully");
     } catch (dbError) {
-      console.error("[Supabase] Failed to save lead:", dbError);
+      console.error("[Supabase] Database Error:", dbError);
     }
 
-    // Step 5: Send Telegram notification for hot leads
-    if (aiResult.hot_level === "hot" || aiResult.score >= 70) {
-      try {
-        await sendHotLeadAlert({
-          name: body.customer.name,
-          phone: body.customer.phone,
-          service: body.service || "Chưa xác định",
-          appointment_date: body.appointment_date,
-          appointment_time: body.appointment_time,
-          hot_level: aiResult.hot_level,
-          score: aiResult.score,
-          ai_summary: aiResult.summary_vi,
-          next_action: aiResult.suggested_next_action,
-        });
-        console.log("[Telegram] Hot lead alert sent");
-      } catch (tgError) {
-        console.error("[Telegram] Failed to send alert:", tgError);
-      }
+    // 6. Gửi thông báo Telegram cho chủ Spa
+    try {
+      await sendHotLeadAlert({
+        name: customerName,
+        phone: customerPhone,
+        service: serviceRequested,
+        hot_level: aiResult.hot_level,
+        score: aiResult.score,
+        ai_summary: aiResult.summary_vi,
+        next_action: aiResult.suggested_next_action,
+      });
+      console.log("[Telegram] Alert sent successfully");
+    } catch (tgError) {
+      console.error("[Telegram] Notification Error:", tgError);
     }
 
-    // Step 5: Return response to FPT.AI
-    const responseMessage =
-      aiResult.hot_level === "hot"
-        ? `Cảm ơn ${body.customer.name}! Chúng tôi đã ghi nhận thông tin và sẽ liên hệ với bạn sớm nhất. ${body.appointment_date ? `Lịch hẹn ngày ${body.appointment_date} đã được xác nhận.` : "Nhân viên sẽ tư vấn lịch phù hợp cho bạn."}`
-        : `Cảm ơn bạn đã quan tâm! Chúng tôi đã nhận thông tin và sẽ liên hệ trong ${aiResult.follow_up_hours} giờ tới để tư vấn chi tiết hơn.`;
+    // 7. Trả phản hồi về cho FPT.AI (Hiển thị lại trong Chatbot)
+    const responseMessage = aiResult.hot_level === "hot"
+      ? `Cảm ơn ${customerName}! Trợ lý AI đã nhận diện nhu cầu của bạn về dịch vụ ${serviceRequested}. Chuyên viên sẽ gọi ngay cho bạn qua số ${customerPhone} trong ít phút tới.`
+      : `Cảm ơn bạn! Chúng tôi đã nhận được thông tin tư vấn ${serviceRequested} và sẽ liên hệ sớm nhất.`;
 
     return NextResponse.json({
-      success: true,
-      message: responseMessage,
-      lead_score: aiResult.score,
-      hot_level: aiResult.hot_level,
-      next_action: aiResult.suggested_next_action,
+      status: "success",
+      messages: [
+        {
+          type: "text",
+          content: responseMessage
+        }
+      ],
+      set_variables: {
+        lead_score: aiResult.score,
+        is_hot: aiResult.hot_level === "hot"
+      }
     });
-  } catch (error) {
-    console.error("[Webhook] Unhandled error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-}
 
-// Health check
-export async function GET() {
-  return NextResponse.json({
-    status: "online",
-    endpoint: "/api/receive-from-fpt",
-    description: "FPT.AI Webhook Receiver for Super SPA AI",
-    timestamp: new Date().toISOString(),
-  });
+  } catch (error) {
+    console.error("[Webhook] Global System Error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
 }
