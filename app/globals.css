@@ -1,0 +1,209 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Google Fonts via Next.js font optimization ── */
+:root {
+  --font-serif: "Noto Serif", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", Inter, sans-serif;
+}
+
+/* ── Base Styles ── */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #fbf9f4;
+  color: #31332e;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Typography Classes ── */
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+/* ── The Digital Sanctuary Design Tokens ── */
+@layer components {
+  /* Glassmorphism Card */
+  .glass-card {
+    @apply bg-white/60 backdrop-blur-[20px] rounded-3xl;
+    box-shadow: 0px 20px 40px rgba(49, 51, 46, 0.05);
+    border: 1px solid rgba(178, 178, 171, 0.15);
+  }
+
+  /* Surface Cards */
+  .spa-card {
+    @apply bg-spa-surface-low rounded-3xl;
+    box-shadow: 0px 8px 30px rgba(49, 51, 46, 0.04);
+  }
+
+  /* Primary Button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-sans font-semibold text-sm transition-all duration-200;
+    background: linear-gradient(135deg, #4b6559, #3f584d);
+    color: #e5fff1;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(75, 101, 89, 0.3);
+  }
+
+  /* Secondary Button */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-sans font-semibold text-sm transition-all duration-200;
+    @apply bg-spa-surface-highest text-spa-sage;
+  }
+
+  .btn-secondary:hover {
+    @apply bg-spa-surface-high;
+  }
+
+  /* Hot Level Badges */
+  .badge-hot {
+    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold;
+    background: #fddada;
+    color: #644c4c;
+  }
+
+  .badge-warm {
+    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold;
+    background: #eaddfd;
+    color: #564d67;
+  }
+
+  .badge-cold {
+    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold;
+    background: #cce9da;
+    color: #3d574c;
+  }
+
+  /* Section Label */
+  .section-label {
+    @apply text-xs font-semibold uppercase tracking-widest;
+    color: #7a7b75;
+  }
+
+  /* Input Field */
+  .spa-input {
+    @apply w-full px-4 py-3 rounded-2xl font-sans text-sm transition-all duration-200 outline-none;
+    background: #ffffff;
+    color: #31332e;
+    border: none;
+  }
+
+  .spa-input:focus {
+    box-shadow: 0 0 0 2px rgba(75, 101, 89, 0.2);
+    background: #fbf9f4;
+  }
+
+  /* Navigation Tab */
+  .nav-tab {
+    @apply flex flex-col items-center gap-1 p-2 rounded-2xl transition-all duration-200 cursor-pointer;
+    color: #7a7b75;
+  }
+
+  .nav-tab.active {
+    color: #4b6559;
+    background: rgba(204, 233, 218, 0.4);
+  }
+
+  /* Floating Chat Button */
+  .chat-fab {
+    @apply fixed bottom-6 right-6 w-14 h-14 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 z-50;
+    background: rgba(251, 249, 244, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(178, 178, 171, 0.2);
+    box-shadow: 0 8px 30px rgba(75, 101, 89, 0.2);
+  }
+
+  .chat-fab:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12px 40px rgba(75, 101, 89, 0.3);
+  }
+
+  /* AI Thinking Animation */
+  .thinking-dot {
+    @apply w-2 h-2 rounded-full;
+    background: #4b6559;
+    animation: thinking 1.4s ease-in-out infinite;
+  }
+
+  .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+  .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  /* Pulse indicator */
+  .pulse-dot {
+    @apply w-2.5 h-2.5 rounded-full;
+    background: #4b6559;
+    box-shadow: 0 0 0 0 rgba(75, 101, 89, 0.4);
+    animation: pulse-ring 2s infinite;
+  }
+
+  /* Score Ring */
+  .score-ring {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* ── Custom Animations ── */
+@keyframes thinking {
+  0%, 60%, 100% { transform: translateY(0); opacity: 1; }
+  30% { transform: translateY(-6px); opacity: 0.6; }
+}
+
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(75, 101, 89, 0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(75, 101, 89, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(75, 101, 89, 0); }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(16px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* ── Scrollbar Styling ── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f5f4ed;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #b2b2ab;
+  border-radius: 999px;
+}
+
+/* ── Progress Bar ── */
+.progress-bar {
+  @apply h-2 rounded-full overflow-hidden;
+  background: #efeee7;
+}
+
+.progress-fill {
+  @apply h-full rounded-full transition-all duration-700;
+  background: linear-gradient(90deg, #4b6559, #cce9da);
+}
