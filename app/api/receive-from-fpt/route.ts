@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { analyzeLeadWithDeepSeek, type LeadData } from "@/lib/deepseek";
 import { appendLeadToSheet, type LeadRow } from "@/lib/sheets";
 import { sendHotLeadAlert } from "@/lib/telegram";
+import { saveLeadToSupabase } from "@/lib/supabase";
 
 // FPT.AI JSON API Card payload schema
 interface FPTPayload {
@@ -100,7 +101,30 @@ export async function POST(req: NextRequest) {
       // Continue even if sheets fails
     }
 
-    // Step 4: Send Telegram notification for hot leads
+    // Step 4: Save to Supabase (Database Persistence)
+    try {
+      await saveLeadToSupabase({
+        session_id: body.session_id,
+        name: body.customer.name,
+        phone: body.customer.phone,
+        email: body.customer.email,
+        service: body.service,
+        appointment_date: body.appointment_date,
+        appointment_time: body.appointment_time,
+        hot_level: aiResult.hot_level,
+        score: aiResult.score,
+        ai_reasons: aiResult.reasons,
+        next_action: aiResult.suggested_next_action,
+        summary: aiResult.summary_vi,
+        status: "new",
+        source: body.source,
+      });
+      console.log("[Supabase] Lead saved successfully");
+    } catch (dbError) {
+      console.error("[Supabase] Failed to save lead:", dbError);
+    }
+
+    // Step 5: Send Telegram notification for hot leads
     if (aiResult.hot_level === "hot" || aiResult.score >= 70) {
       try {
         await sendHotLeadAlert({
