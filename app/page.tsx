@@ -40,59 +40,63 @@ export default function LandingPage() {
       {/* ── Hero Section ── */}
       <section className="pt-28 pb-16 px-6 max-w-md mx-auto text-center">
         {/* Social Proof Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-spa-blush-container mb-6 animate-fade-in">
-          <span className="text-sm">🔥</span>
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-spa-blush-container mb-6 animate-fade-in shadow-sm border border-spa-blush/10">
+          <span className="text-sm">✨</span>
           <span className="text-xs font-semibold text-spa-blush">
-            {leadCount} khách đặt lịch tuần này
+            Hơn 1,200 khách hàng đã tin tưởng
           </span>
-          <span className="badge-hot text-[10px] px-2 py-0.5">HOT</span>
         </div>
 
-        <h1 className="font-serif text-4xl font-bold text-spa-on-surface mb-4 leading-tight tracking-tight animate-slide-up">
+        <h1 className="font-serif text-3xl sm:text-4xl font-bold text-spa-on-surface mb-4 leading-tight tracking-tight animate-slide-up">
           Spa Thông Minh
           <br />
           <span
+            className="inline-block mt-1"
             style={{
               background: "linear-gradient(135deg, #4b6559, #735959)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
             }}
           >
-            Dẫn Đầu Thị Trường
+            Dân Đầu Công Nghệ AI
           </span>
         </h1>
 
-        <p className="text-spa-on-surface-variant text-base leading-relaxed mb-8">
-          Kết hợp AI DeepSeek + FPT.AI để tự động phân tích khách hàng,
-          quản lý lịch hẹn, và gửi thông báo real-time.
+        <p className="text-spa-on-surface-variant text-base leading-relaxed mb-8 px-4">
+          Cá nhân hóa liệu trình bằng AI DeepSeek. Đặt lịch nhanh chóng, 
+          phục vụ tận tâm 24/7 qua trợ lý ảo thông minh.
         </p>
 
         {/* Primary CTA */}
-        <div className="space-y-3">
-          <button className="btn-primary w-full py-4 text-base">
-            <span>💬</span>
-            Nhận Tư Vấn Miễn Phí Ngay
+        <div className="space-y-4 px-2">
+          <button className="btn-primary w-full py-4 text-base shadow-spa-float active:scale-[0.98] transition-transform">
+            <span>🌿</span>
+            Nhận Tư Vấn Liệu Trình Ngay
           </button>
-          <p className="text-xs text-spa-on-surface-variant">
-            AI phân tích & kết nối bạn trong 30 giây
-          </p>
+          <div className="flex items-center justify-center gap-4 text-[10px] text-spa-on-surface-variant font-medium uppercase tracking-wider">
+            <span className="flex items-center gap-1">✅ Phản hồi &lt; 1p</span>
+            <span className="flex items-center gap-1">✅ Tư vấn miễn phí</span>
+          </div>
         </div>
       </section>
 
-      {/* ── Trust Bar ── */}
+      {/* ── Trust Bar & Urgency ── */}
       <section className="px-6 max-w-md mx-auto">
-        <div className="spa-card p-4">
-          <p className="section-label text-center mb-3">Được hỗ trợ bởi</p>
-          <div className="flex justify-around items-center flex-wrap gap-3">
+        <div className="spa-card p-5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-spa-blush/5 rounded-full -mr-12 -mt-12" />
+          <p className="section-label text-center mb-4">CÔNG NGHỆ HIỆN ĐẠI</p>
+          <div className="flex justify-around items-center flex-wrap gap-4">
             {[
-              { icon: "🤖", label: "DeepSeek AI" },
-              { icon: "📊", label: "CRM Tự Động" },
-              { icon: "📱", label: "Telegram Alerts" },
+              { icon: "🧠", label: "DeepSeek V3" },
               { icon: "⚡", label: "FPT.AI Chat" },
+              { icon: "📱", label: "Realtime Alert" },
+              { icon: "💎", label: "Premium Care" },
             ].map((item) => (
-              <div key={item.label} className="flex flex-col items-center gap-1">
-                <span className="text-2xl">{item.icon}</span>
-                <span className="text-[10px] font-semibold text-spa-on-surface-variant">
+              <div key={item.label} className="flex flex-col items-center gap-1.5">
+                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
+                  <span className="text-xl">{item.icon}</span>
+                </div>
+                <span className="text-[9px] font-bold text-spa-on-surface tracking-tighter">
                   {item.label}
                 </span>
               </div>
@@ -103,95 +107,107 @@ export default function LandingPage() {
 
       {/* ── Services Section ── */}
       <section className="px-6 py-12 max-w-md mx-auto">
-        <p className="section-label mb-2">DỊCH VỤ NỔI BẬT</p>
+        <p className="section-label mb-2 text-spa-sage">LỰA CHỌN PHỔ BIẾN</p>
         <h2 className="font-serif text-2xl font-bold mb-6">
-          Trải Nghiệm Đỉnh Cao
+          Dịch Vụ Được Yêu Thích
         </h2>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {[
             {
               icon: "✨",
               name: "Facial Treatment Premium",
               desc: "Chăm sóc da mặt chuyên sâu với công nghệ Châu Âu",
-              price: "từ 890.000đ",
+              price: "890.000đ",
               hot: true,
             },
             {
               icon: "💆",
               name: "Body Massage Thư Giãn",
               desc: "Massage toàn thân 90 phút với tinh dầu thiên nhiên",
-              price: "từ 650.000đ",
+              price: "650.000đ",
               hot: false,
             },
-            {
-              icon: "🌹",
-              name: "Detox & Slimming",
-              desc: "Giảm mỡ bụng, detox cơ thể với công nghệ hiện đại",
-              price: "từ 1.200.000đ",
-              hot: true,
-            },
           ].map((service) => (
-            <div key={service.name} className="spa-card p-4 flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-spa-sage-container flex items-center justify-center text-2xl flex-shrink-0">
+            <div key={service.name} className="spa-card p-4 flex items-start gap-4 hover:bg-spa-surface-high transition-colors cursor-pointer group">
+              <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center text-2xl flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
                 {service.icon}
               </div>
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-semibold text-sm">{service.name}</h3>
-                  {service.hot && <span className="badge-hot">HOT</span>}
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="font-bold text-sm text-spa-on-surface">{service.name}</h3>
+                  {service.hot && <span className="badge-hot text-[9px] px-1.5 py-0.5">HOT</span>}
                 </div>
-                <p className="text-xs text-spa-on-surface-variant mb-2">
+                <p className="text-[11px] text-spa-on-surface-variant leading-relaxed mb-2">
                   {service.desc}
                 </p>
-                <p className="text-spa-sage font-semibold text-sm">
-                  {service.price}
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="text-spa-sage font-bold text-sm">
+                    {service.price}
+                  </p>
+                  <button className="text-[10px] font-bold text-spa-blush underline">Chi tiết</button>
+                </div>
               </div>
             </div>
           ))}
         </div>
       </section>
 
+      {/* ── Testimonials (Social Proof) ── */}
+      <section className="px-6 py-8 max-w-md mx-auto">
+        <div className="bg-spa-sage/5 rounded-[2rem] p-6 border border-spa-sage/10">
+          <p className="section-label mb-4 text-center">KHÁCH HÀNG NÓI GÌ</p>
+          <div className="text-center">
+            <div className="flex justify-center gap-1 mb-3">
+              {[...Array(5)].map((_, i) => <span key={i} className="text-xs text-spa-blush">⭐</span>)}
+            </div>
+            <p className="italic text-spa-on-surface-variant text-sm mb-4">
+              "Lần đầu tiên trải nghiệm đặt lịch qua AI, nhanh đến không ngờ! Nhân viên tư vấn đúng nhu cầu mình cần."
+            </p>
+            <p className="font-bold text-xs text-spa-sage">— Chị Thu Hà, Quận 1</p>
+          </div>
+        </div>
+      </section>
+
       {/* ── AI Workflow Section ── */}
       <section className="px-6 py-8 max-w-md mx-auto">
-        <div className="glass-card p-6">
-          <p className="section-label mb-2">QUITRÌNH AI</p>
-          <h2 className="font-serif text-xl font-bold mb-4">
-            Tự Động Hóa 100%
+        <div className="glass-card p-6 border-spa-sage/20">
+          <p className="section-label mb-2 text-spa-sage">CÔNG NGHỆ VẬN HÀNH</p>
+          <h2 className="font-serif text-xl font-bold mb-5">
+            Hệ Thống Tự Động Hóa
           </h2>
-          <div className="space-y-4">
+          <div className="space-y-5">
             {[
-              { step: "1", text: "Khách nhắn tin qua FPT.AI Chat Widget" },
-              {
-                step: "2",
-                text: "DeepSeek AI phân tích & chấm điểm hot/warm/cold",
-              },
-              { step: "3", text: "Tự động ghi vào Google Sheets CRM" },
-              { step: "4", text: "Alert Telegram ngay cho chủ spa" },
-              { step: "5", text: "Nhắc hẹn tự động trước 1 ngày" },
+              { step: "1", title: "Kết nối", text: "Trò chuyện trực tiếp với AI 24/7" },
+              { step: "2", title: "Phân tích", text: "DeepSeek chấm điểm & gợi ý liệu trình" },
+              { step: "3", title: "Phục vụ", text: "Chủ spa nhận thông báo & phục vụ ngay" },
             ].map((item) => (
-              <div key={item.step} className="flex items-center gap-4">
-                <div className="w-8 h-8 rounded-full bg-spa-sage flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+              <div key={item.step} className="flex gap-4">
+                <div className="w-6 h-6 rounded-lg bg-spa-sage text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">
                   {item.step}
                 </div>
-                <p className="text-sm text-spa-on-surface-variant">{item.text}</p>
+                <div>
+                  <h4 className="text-xs font-bold text-spa-on-surface mb-0.5">{item.title}</h4>
+                  <p className="text-[11px] text-spa-on-surface-variant">{item.text}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Bottom CTA ── */}
-      <section className="px-6 py-12 pb-24 max-w-md mx-auto text-center">
-        <h2 className="font-serif text-2xl font-bold mb-3">
-          Sẵn Sàng Bắt Đầu?
-        </h2>
-        <p className="text-spa-on-surface-variant text-sm mb-6">
-          Để lại thông tin, AI sẽ tư vấn dịch vụ phù hợp nhất với bạn
-        </p>
-        <button className="btn-primary w-full py-4 text-base">
+      {/* ── Bottom CTA & Scarcity ── */}
+      <section className="px-6 py-12 pb-32 max-w-md mx-auto text-center">
+        <div className="mb-8">
+          <h2 className="font-serif text-2xl font-bold mb-3 text-spa-on-surface">
+            Trải Nghiệm Ngay
+          </h2>
+          <p className="text-spa-on-surface-variant text-sm mb-6">
+            Chỉ còn <span className="text-spa-blush font-bold">3 suất ưu đãi</span> giảm 20% trong ngày hôm nay.
+          </p>
+        </div>
+        <button className="btn-primary w-full py-4 text-base shadow-spa-float animate-pulse">
           <span>🌿</span>
-          Đặt Lịch Ngay Hôm Nay
+          Đăng Ký Nhận Ưu Đãi
         </button>
       </section>
 

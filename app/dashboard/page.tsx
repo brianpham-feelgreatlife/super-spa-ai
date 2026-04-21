@@ -176,9 +176,14 @@ export default function DashboardPage() {
             </button>
           </div>
         ) : leads.length === 0 ? (
-          <div className="spa-card p-8 text-center">
-            <p className="text-4xl mb-2">🌿</p>
-            <p className="text-spa-on-surface-variant">Không có lead nào</p>
+          <div className="spa-card p-12 text-center border-dashed border-2 border-spa-sage/20 bg-transparent shadow-none animate-fade-in">
+            <div className="w-20 h-20 bg-spa-sage/5 rounded-full flex items-center justify-center mx-auto mb-6">
+              <span className="text-4xl animate-bounce">🌱</span>
+            </div>
+            <h3 className="font-serif text-xl font-bold text-spa-on-surface mb-2">Đang chờ khách đầu tiên</h3>
+            <p className="text-xs text-spa-on-surface-variant max-w-[200px] mx-auto leading-relaxed">
+              Hệ thống AI đã sẵn sàng 24/7. Các tin nhắn từ FPT.AI sẽ xuất hiện tại đây ngay lập tức.
+            </p>
           </div>
         ) : (
           leads.map((lead) => {
