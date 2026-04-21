@@ -211,19 +211,7 @@ export default function LandingPage() {
         </button>
       </section>
 
-      {/* ── Floating Chat Button (FPT.AI Placeholder) ── */}
-      <div className="chat-fab group">
-        <div className="text-spa-sage text-2xl">💬</div>
-        {/* Pulsing ring */}
-        <div
-          className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-spa-blush-container"
-          style={{ animation: "pulse-ring 2s infinite" }}
-        />
-        {/* Tooltip */}
-        <div className="absolute bottom-16 right-0 glass-card px-3 py-2 text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
-          Tư vấn ngay với AI
-        </div>
-      </div>
+      {/* FPT.AI Chatbot will render here via layout script */}
 
       {/* ── Bottom Navigation ── */}
       <nav className="fixed bottom-0 left-0 right-0 glass-card rounded-none border-t-0 rounded-t-3xl">
